@@ -25,9 +25,12 @@ class Tic_Tac_Toe():
         # Input from user in form of clicks
         self.window.bind('<Button-1>', self.click)
 
-        self.initialize_board()
+        self.start()
         self.player_X_turns = True
         self.board_status = np.zeros(shape=(3, 3))
+        self.start_game = True
+        self.difficulty = -1
+
 
         self.player_X_starts = True
         self.reset_board = False
@@ -50,6 +53,22 @@ class Tic_Tac_Toe():
         for i in range(2):
             self.canvas.create_line(0, (i + 1) * size_of_board / 3, size_of_board, (i + 1) * size_of_board / 3)
 
+    def start(self):
+        self.canvas.delete("all")
+        self.initialize_board()
+        self.canvas.create_text(6 * size_of_board / 12, 2 * size_of_board / 12, font="cmr 35 bold", fill=Green_color,
+                                text="DIFFICULTY")
+        self.canvas.create_text(2 * size_of_board / 12, 6 * size_of_board / 12, font="cmr 30 bold", fill=Green_color,
+                                text="EASY")
+        self.canvas.create_text(10 * size_of_board / 12, 6 * size_of_board / 12, font="cmr 30 bold", fill=Green_color,
+                                text="NORMAL")
+        self.canvas.create_text(2 * size_of_board / 12, 10 * size_of_board / 12, font="cmr 30 bold", fill=Green_color,
+                                text="IMPOSSIBLE")
+        self.canvas.create_text(10 * size_of_board / 12, 10 * size_of_board / 12, font="cmr 30 bold", fill=Green_color,
+                                text="2 PLAYER")
+
+
+
     def play_again(self):
         self.initialize_board()
         self.player_X_starts = not self.player_X_starts
@@ -66,6 +85,7 @@ class Tic_Tac_Toe():
         # logical_position = grid value on the board
         # grid_position = actual pixel values of the center of the grid
         grid_position = self.convert_logical_to_grid_position(logical_position)
+        print(logical_position)
         self.canvas.create_oval(grid_position[0] - symbol_size, grid_position[1] - symbol_size,
                                 grid_position[0] + symbol_size, grid_position[1] + symbol_size, width=symbol_thickness,
                                 outline=symbol_O_color)
@@ -188,7 +208,19 @@ class Tic_Tac_Toe():
         grid_position = [event.x, event.y]
         logical_position = self.convert_grid_to_logical_position(grid_position)
 
-        if not self.reset_board:
+        if self.difficulty < 0:
+            if logical_position[0] == 0 and logical_position[1] == 1:
+                self.difficulty = 1
+            elif logical_position[0] == 2 and logical_position[1] == 1:
+                self.difficulty = 2
+            elif logical_position[0] == 0 and logical_position[1] == 2:
+                self.difficulty = 3
+            elif logical_position[0] == 2 and logical_position[1] == 2:
+                self.difficulty = 0
+            if self.difficulty > -1:
+                self.canvas.delete("all")
+                self.play_again()
+        elif not self.reset_board:
             if self.player_X_turns:
                 if not self.is_grid_occupied(logical_position):
                     self.draw_X(logical_position)
