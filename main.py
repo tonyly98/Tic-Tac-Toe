@@ -143,11 +143,11 @@ class Tic_Tac_Toe():
             self.easy_bot()
 
     def easy_bot(self):
-        a = randrange(0, 2)
-        b = randrange(0, 2)
+        a = randrange(0, 3)
+        b = randrange(0, 3)
         while self.is_grid_occupied([a, b]):
-            a = randrange(0, 2)
-            b = randrange(0, 2)
+            a = randrange(0, 3)
+            b = randrange(0, 3)
         logical_position = [a, b]
         if self.player_X_turns:
             if not self.is_grid_occupied(logical_position):
@@ -183,8 +183,6 @@ class Tic_Tac_Toe():
             return True
 
     def is_grid_occupied_bot(self, a, b):
-        if a == -1 and b == -1:
-            return False
         if self.board_status[a, b] == 0:
             return False
         else:
@@ -272,14 +270,16 @@ class Tic_Tac_Toe():
                     self.board_status[logical_position[0]][logical_position[1]] = 1
                     self.player_X_turns = not self.player_X_turns
                     self.bot_turn = True
-            if not self.is_gameover():
-                if self.bot_turn:
-                    self.bot()
+
 
             # Check if game is concluded
             if self.is_gameover():
                 self.display_gameover()
                 # print('Done')
+            elif self.bot_turn:
+                self.bot()
+                if self.is_gameover():
+                    self.display_gameover()
         else:  # Play Again
             self.canvas.delete("all")
             self.play_again()
