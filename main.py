@@ -4,6 +4,7 @@
 
 from tkinter import *
 import numpy as np
+from random import *
 
 size_of_board = 600
 symbol_size = (size_of_board / 3 - size_of_board / 8) / 2
@@ -30,6 +31,7 @@ class Tic_Tac_Toe():
         self.board_status = np.zeros(shape=(3, 3))
         self.start_game = True
         self.difficulty = -1
+        self.bot_turn = False
 
 
         self.player_X_starts = True
@@ -133,6 +135,35 @@ class Tic_Tac_Toe():
                                 text=score_text)
 
     # ------------------------------------------------------------------
+    # AI to play game:
+    # ------------------------------------------------------------------
+
+    def bot(self):
+        if self.difficulty == 1:
+            self.easy_bot()
+
+    def easy_bot(self):
+        a = randrange(0, 2)
+        b = randrange(0, 2)
+        while self.is_grid_occupied([a, b]):
+            a = randrange(0, 2)
+            b = randrange(0, 2)
+        logical_position = [a, b]
+        if self.player_X_turns:
+            if not self.is_grid_occupied(logical_position):
+                self.draw_X(logical_position)
+                self.board_status[logical_position[0]][logical_position[1]] = -1
+                self.player_X_turns = not self.player_X_turns
+        else:
+            if not self.is_grid_occupied(logical_position):
+                self.draw_O(logical_position)
+                self.board_status[logical_position[0]][logical_position[1]] = 1
+                self.player_X_turns = not self.player_X_turns
+        self.bot_turn = False
+
+
+
+    # ------------------------------------------------------------------
     # Logical Functions:
     # The modules required to carry out game logic
     # ------------------------------------------------------------------
@@ -147,6 +178,14 @@ class Tic_Tac_Toe():
 
     def is_grid_occupied(self, logical_position):
         if self.board_status[logical_position[0]][logical_position[1]] == 0:
+            return False
+        else:
+            return True
+
+    def is_grid_occupied_bot(self, a, b):
+        if a == -1 and b == -1:
+            return False
+        if self.board_status[a, b] == 0:
             return False
         else:
             return True
@@ -226,11 +265,16 @@ class Tic_Tac_Toe():
                     self.draw_X(logical_position)
                     self.board_status[logical_position[0]][logical_position[1]] = -1
                     self.player_X_turns = not self.player_X_turns
+                    self.bot_turn = True
             else:
                 if not self.is_grid_occupied(logical_position):
                     self.draw_O(logical_position)
                     self.board_status[logical_position[0]][logical_position[1]] = 1
                     self.player_X_turns = not self.player_X_turns
+                    self.bot_turn = True
+            if not self.is_gameover():
+                if self.bot_turn:
+                    self.bot()
 
             # Check if game is concluded
             if self.is_gameover():
@@ -240,7 +284,8 @@ class Tic_Tac_Toe():
             self.canvas.delete("all")
             self.play_again()
             self.reset_board = False
-
+            if self.player_X_starts:
+                self.bot()
 
 game_instance = Tic_Tac_Toe()
 game_instance.mainloop()
